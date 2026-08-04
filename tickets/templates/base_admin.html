@@ -1,0 +1,614 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Replica Assist{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#f4f6f9;
+  color:#0f172a;
+  overflow-x:hidden;
+}
+.layout{display:flex;min-height:100vh;align-items:flex-start}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  height:100vh;
+  background:linear-gradient(180deg,#ffffff 0%,#5ab0dd 100%);
+  padding:26px 18px;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid rgba(90,176,221,0.35);
+  position:sticky;
+  top:0;
+  overflow-y:auto;
+}
+.logo{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin-bottom:26px;
+  padding:0 6px;
+}
+.logo img{
+  display:block;
+  width:100%;
+  max-width:170px;
+  max-height:64px;
+  height:auto;
+  object-fit:contain;
+}
+
+.nav{display:flex;flex-direction:column;gap:10px}
+.nav a{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:600;
+
+  color:#1f2937;
+
+  padding:12px 14px;
+
+  border-radius:12px;
+
+  transition:all .2s ease;
+}
+.menu-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:26px;
+  height:26px;
+
+  border-radius:8px;
+
+  background:rgba(255,255,255,0.75);
+
+  color:#5ab0dd;
+
+  font-size:14px;
+  font-weight:700;
+
+  transition:all .2s ease;
+}
+
+.nav a:hover .menu-icon{
+  background:#6b4180;
+  color:white;
+}
+
+.nav a.active .menu-icon{
+  background:#6b4180;
+  color:white;
+}
+.nav a:hover{background:rgba(255,255,255,0.9)}
+.nav a.active{
+  background:rgba(107,65,128,0.14);
+  color:#0f172a;
+  box-shadow:0 10px 25px rgba(15,23,42,0.08);
+}
+.nav .sec-title{
+  margin:14px 8px 6px;
+  font-size:12px;
+  font-weight:700;
+  color:#64748b;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+
+/* MAIN */
+.main{flex:1;padding:32px 46px;min-width:0}
+
+/* TOPBAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+.page-title{
+  font-size:16px;
+  color:#64748b;
+  font-weight:600;
+}
+.user-box{display:flex;align-items:center;gap:14px;min-width:0}
+
+.notif{
+  position:relative;
+  cursor:pointer;
+}
+.notif .dot{
+  position:absolute;top:-3px;right:-3px;
+  width:9px;height:9px;border-radius:50%;
+  background:#ef4444;
+  display:inline-block;
+}
+.notif-btn{
+  border:none;background:transparent;cursor:pointer;
+  padding:8px;border-radius:12px;
+  font-size:20px;
+  line-height:1;
+}
+.notif-btn:hover{background:rgba(0,0,0,0.04)}
+.notif-panel{
+  position:absolute;
+  right:0;top:42px;
+  width:min(320px, calc(100vw - 28px));
+  background:white;
+  border-radius:14px;
+  box-shadow:0 20px 50px rgba(15,23,42,0.15);
+  border:1px solid #e5e7eb;
+  display:none;
+  overflow:hidden;
+  z-index:99;
+}
+.notif.open .notif-panel{display:block}
+.notif-head{
+  padding:12px 14px;
+  font-weight:700;
+  border-bottom:1px solid #eef2f7;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.notif-list{max-height:340px;overflow:auto}
+.notif-item{
+  padding:12px 14px;
+  border-bottom:1px solid #f1f5f9;
+}
+.notif-item a{
+  text-decoration:none;color:#0f172a;
+  display:block;
+}
+.notif-item small{color:#64748b}
+.badge{
+  font-size:12px;
+  padding:2px 8px;
+  border-radius:999px;
+  background:rgba(90,176,221,0.18);
+  color:#0b4e76;
+  font-weight:700;
+}
+
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:#6b4180;
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:800;
+}
+.username{font-size:14px;font-weight:700;color:#0f172a}
+.userrole{font-size:12px;color:#64748b;font-weight:600;margin-top:2px}
+.user-meta{min-width:0}
+.username,
+.userrole{overflow-wrap:anywhere}
+
+
+/* buttons / inputs */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  border-radius:14px;
+  border:none;
+  background:#5ab0dd;
+  color:white;
+  text-decoration:none;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 12px 22px rgba(107,65,128,0.22);
+  transition:0.2s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.secondary{
+  background:#0f172a;
+  box-shadow:0 12px 22px rgba(15,23,42,0.20);
+}
+.btn.light{
+  background:#ffffff;
+  color:#0f172a;
+  border:1px solid #e5e7eb;
+  box-shadow:none;
+}
+
+.input{
+  width:100%;
+  padding:12px 12px;
+  border-radius:12px;
+  border:1px solid #e5e7eb;
+  background:#ffffff;
+  outline:none;
+  font-size:14px;
+}
+.input:focus{
+  border-color:#6b4180;
+  box-shadow:0 0 0 4px rgba(107,65,128,0.15);
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  box-shadow:0 12px 30px rgba(15,23,42,0.06);
+  border:1px solid #eef2f7;
+}
+.card-pad{padding:18px}
+
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.summary-value{font-size:32px;font-weight:900;color:#5ab0dd;}
+.menu-toggle{
+  display:none;
+}
+
+@media(max-width:1100px){
+
+  .layout{
+    display:block;
+  }
+
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:-100%;
+    width:260px;
+    height:100vh;
+    z-index:9999;
+    transition:0.3s;
+    box-shadow:0 0 30px rgba(0,0,0,0.2);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .menu-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:#5ab0dd;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+  }
+
+  .topbar{
+    gap:12px;
+  }
+
+  .main{
+    padding:18px;
+    padding-top:74px;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4{
+    grid-template-columns:1fr;
+  }
+
+  .table{
+    display:block;
+    overflow-x:auto;
+  }
+
+  .menu-toggle{
+    position:fixed;
+    top:18px;
+    left:18px;
+    z-index:10001;
+  }
+
+}
+
+@media(max-width:760px){
+  .topbar{
+    flex-direction:column;
+    align-items:stretch;
+    gap:16px;
+  }
+
+  .user-box{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .notif{
+    position:static;
+  }
+
+  .notif-panel{
+    right:auto;
+    left:0;
+    top:48px;
+  }
+
+  .sidebar{
+    width:88vw;
+    max-width:320px;
+    height:100vh;
+  }
+
+  .main{
+    padding:14px;
+    padding-top:74px;
+  }
+}
+
+@media(max-width:420px){
+  .main{
+    padding:10px;
+    padding-top:70px;
+  }
+
+  .card-pad{
+    padding:14px;
+  }
+
+  .topbar{
+    gap:12px;
+    margin-bottom:14px;
+  }
+
+  .page-title{
+    font-size:14px;
+  }
+
+  .user-box{
+    gap:10px;
+  }
+
+  .avatar{
+    width:32px;
+    height:32px;
+    font-size:12px;
+  }
+
+  .username{
+    font-size:13px;
+  }
+
+  .userrole{
+    font-size:11px;
+  }
+
+  .notif-panel{
+    width:calc(100vw - 20px);
+    max-width:none;
+  }
+
+  .sidebar{
+    width:92vw;
+  }
+}
+/* logout */
+.logout-form{
+  margin-top:auto;
+  padding-top:20px;
+}
+.logout-btn{
+  padding:10px 14px;
+  border:none;
+  background:rgba(255,255,255,0.75);
+  border-radius:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.logout-btn:hover{background:#fff}
+.small{font-size:12px;color:#64748b}
+
+/* table */
+.table{
+  width:100%;
+  border-collapse:collapse;
+}
+.table th{
+  text-align:left;
+  padding:12px 10px;
+  font-size:12px;
+  color:#64748b;
+  border-bottom:1px solid #eef2f7;
+}
+.table td{
+  padding:12px 10px;
+  border-bottom:1px solid #f1f5f9;
+  font-size:14px;
+}
+.row-actions a{margin-right:8px}
+.pill{
+  display:inline-flex;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  background:#f1f5f9;
+  color:#0f172a;
+}
+.pill.red{background:#fee2e2;color:#991b1b}
+.pill.yellow{background:#fef9c3;color:#854d0e}
+.pill.green{background:#dcfce7;color:#166534}
+.pill.blue{background:rgba(90,176,221,0.18);color:#0b4e76}
+</style>
+
+</head>
+<body>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">
+          <img src="https://imagenesassist.blob.core.windows.net/static/Logo%20Replica%20Assist%20Beta.png" alt="Replica Assist">
+    </div>
+
+    <nav class="nav">
+      <a class="{% if request.path == '/' %}active{% endif %}" href="{% url 'dashboard' %}">
+      <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-gestion-tickets.png" alt="Gestión Tickets" style="width:100%; height:100%; object-fit:contain;"></span> Ver Tickets
+      </a>
+
+      <a class="{% if '/create-ticket/' in request.path %}active{% endif %}" href="{% url 'create_ticket' %}">
+      <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-lista-tickets.png" alt="Crear Ticket" style="width:100%; height:100%; object-fit:contain;"></span> Crear Ticket
+      </a>
+
+      {% if request.user.profile.role.name == "ADMINISTRADOR" %}
+        <div class="sec-title">Administración</div>
+        <a class="{% if '/admin-portal/' in request.path %}active{% endif %}" href="{% url 'admin_portal' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-panel-admin.png" alt="Panel Admin" style="width:100%; height:100%; object-fit:contain;"></span> Panel Admin
+        </a>
+
+        <a class="{% if '/admin-users/' in request.path %}active{% endif %}" href="{% url 'admin_users' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-usuarios.png" alt="Usuarios" style="width:100%; height:100%; object-fit:contain;"></span> Usuarios
+        </a>
+
+        <a class="{% if '/admin-companies/' in request.path %}active{% endif %}" href="{% url 'admin_companies' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-empresas.png" alt="Empresas" style="width:100%; height:100%; object-fit:contain;"></span> Empresas
+        </a>
+
+        <a class="{% if '/admin-support/' in request.path %}active{% endif %}" href="{% url 'admin_support' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-soporte.png" alt="Soporte" style="width:100%; height:100%; object-fit:contain;"></span> Gestión Tickets Soporte
+        </a>
+      
+        <a class="{% if '/admin-tickets/' in request.path %}active{% endif %}" href="{% url 'admin_tickets' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-gestion-tickets.png" alt="Gestión Tickets" style="width:100%; height:100%; object-fit:contain;"></span> Gestión Tickets
+        </a>
+        <a class="{% if '/admin-backup/' in request.path %}active{% endif %}" href="{% url 'admin_backup' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-panel-general.png" alt="Respaldos" style="width:100%; height:100%; object-fit:contain;"></span> Respaldos
+        </a>
+        <a class="{% if '/admin_categories/' in request.path %}active{% endif %}" href="{% url 'admin_categories' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-panel-general.png" alt="Categorías" style="width:100%; height:100%; object-fit:contain;"></span>  Categorías
+        </a>
+        <a class="{% if '/admin_sla/' in request.path %}active{% endif %}" href="{% url 'admin_sla' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-SLA.png" alt="SLA" style="width:100%; height:100%; object-fit:contain;"></span> SLA
+        </a>
+
+        <a class="{% if '/admin-notifications/' in request.path %}active{% endif %}" href="{% url 'admin_notifications' %}">
+        <span class="menu-icon"><img src="https://imagenesassist.blob.core.windows.net/static/i-notificaciones.png" alt="Notificaciones" style="width:100%; height:100%; object-fit:contain;"></span> Notificaciones
+        </a>
+      {% endif %}
+    </nav>
+
+    <form class="logout-form" method="POST" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button class="logout-btn" type="submit">Cerrar sesión</button>
+      <div class="small" style="margin-top:10px;">
+        {% if request.user.profile.company %}
+          Empresa: <b>{{ request.user.profile.company.name }}</b>
+        {% endif %}
+      </div>
+    </form>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+
+      <button class="menu-toggle" onclick="toggleMenu()">
+        ☰
+      </button>
+
+      <div class="page-title">{% block top_title %}{% endblock %}</div>
+
+      <div class="user-box">
+        <div class="notif" id="notifBox">
+          <button class="notif-btn" type="button" onclick="toggleNotif()">
+            🔔
+            {% if unread_count|default:0 > 0 %}<span class="dot"></span>{% endif %}
+          </button>
+          <div class="notif-panel">
+            <div class="notif-head">
+              <span>Notificaciones</span>
+              {% if unread_count|default:0 > 0 %}<span class="badge">{{ unread_count }}</span>{% endif %}
+            </div>
+
+            <div class="notif-list">
+              {% if notifs %}
+                {% for n in notifs %}
+                  <div class="notif-item">
+                    <a href="{% url 'notification_read' n.id %}">
+                      <b>{% if not n.is_read %}🟦{% else %}⬜{% endif %} {{ n.title }}</b><br>
+                      <small>{{ n.body }}</small>
+                    </a>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="notif-item"><small>No hay notificaciones.</small></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="avatar">
+          {% if request.user.first_name %}
+            {{ request.user.first_name|slice:":1"|upper }}
+          {% else %}
+            {{ request.user.username|slice:":1"|upper }}
+          {% endif %}
+        </div>
+        <div class="user-meta">
+
+        <div class="username">
+          {% if request.user.first_name %}
+            {{ request.user.first_name }} {{ request.user.last_name }}
+          {% else %}
+            {{ request.user.username }}
+          {% endif %}
+        </div>
+
+        <div class="userrole">
+          {{ request.user.profile.role.name }}
+        </div>
+
+      </div>
+      </div>
+    </div>
+
+    {% if messages %}
+      <div class="card card-pad" style="margin-bottom:16px;">
+        {% for m in messages %}
+          <div style="font-weight:700;">{{ m }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<script>
+function toggleNotif(){
+  const el = document.getElementById("notifBox");
+  el.classList.toggle("open");
+}
+document.addEventListener("click", function(e){
+  const box = document.getElementById("notifBox");
+  if(!box) return;
+  if(!box.contains(e.target)){
+    box.classList.remove("open");
+  }
+});
+</script>
+<script>
+
+function toggleMenu(){
+
+  const sidebar = document.querySelector(".sidebar");
+
+  sidebar.classList.toggle("open");
+}
+
+</script>
+</body>
+</html> 

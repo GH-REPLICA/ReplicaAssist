@@ -1,0 +1,67 @@
+{% extends "base_admin.html" %}
+{% block top_title %}SLA{% endblock %}
+{% block content %}
+
+<div class="card card-pad">
+
+<div style="font-size:22px;font-weight:900;margin-bottom:14px;">
+Configuración SLA
+</div>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<table class="table">
+
+<thead>
+<tr>
+<th>Severidad</th>
+<th>Respuesta (min)</th>
+<th>Resolución (min)</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for sla in slas %}
+
+<tr>
+
+<td><b>{{ sla.severity }}</b></td>
+
+<td>
+<input
+class="input"
+type="number"
+name="response_{{ sla.id }}"
+value="{{ sla.response_minutes }}"
+>
+</td>
+
+<td>
+<input
+class="input"
+type="number"
+name="resolution_{{ sla.id }}"
+value="{{ sla.resolution_minutes }}"
+>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<div style="margin-top:14px;">
+<button class="btn">Guardar cambios</button>
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base_admin.html" %}
+{% block content %}
+
+<div style="display:flex;height:80vh;gap:20px;">
+
+<!-- LISTA TICKETS -->
+
+<div style="
+width:350px;
+background:white;
+border-radius:14px;
+padding:10px;
+overflow:auto;
+">
+
+<div style="font-weight:900;margin-bottom:10px;">
+Tickets
+</div>
+
+{% for t in tickets %}
+
+<a href="?ticket={{t.id}}" style="
+display:block;
+padding:12px;
+border-radius:10px;
+margin-bottom:8px;
+text-decoration:none;
+color:#111;
+background:{% if selected and selected.id == t.id %}#f0f9ff{% else %}#f9fafb{% endif %};
+">
+
+<div style="font-weight:700;">
+{{t.code}}
+</div>
+
+<div style="font-size:13px;">
+{{t.title}}
+</div>
+
+<div class="small">
+{{t.status}}
+</div>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+
+<!-- DETALLE -->
+
+<div style="
+flex:1;
+background:white;
+border-radius:14px;
+padding:20px;
+overflow:auto;
+">
+
+{% if selected %}
+
+<div style="font-size:22px;font-weight:900;">
+{{selected.code}} — {{selected.title}}
+</div>
+
+<div class="small" style="margin-top:5px;">
+Estado: {{selected.status}} |
+Prioridad: {{selected.priority}}
+</div>
+
+<div style="margin-top:20px;">
+{{selected.description}}
+</div>
+
+<hr style="margin:20px 0">
+
+<div style="margin-top:20px;font-weight:900;">
+Conversación
+</div>
+
+<div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;">
+
+{% for m in selected.messages.all %}
+
+<div style="
+padding:10px;
+border-radius:10px;
+background:{% if m.author == request.user %}#2b98b3{% else %}#f1f5f9{% endif %};
+color:{% if m.author == request.user %}white{% else %}#111{% endif %};
+max-width:70%;
+align-self:{% if m.author == request.user %}flex-end{% else %}flex-start{% endif %};
+">
+
+<div style="font-size:12px;font-weight:700;">
+{{m.author.username}} · {{m.created_at|date:"H:i"}}
+</div>
+
+<div>
+{{m.body}}
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="small">No hay mensajes aún.</div>
+
+{% endfor %}
+
+<form method="POST" action="{% url 'ticket_detail' selected.id %}" style="margin-top:20px;">
+{% csrf_token %}
+
+<textarea name="body" class="input" rows="3" placeholder="Escribe un mensaje..."></textarea>
+
+<div style="margin-top:10px;">
+<button class="btn">Enviar</button>
+</div>
+
+</form>
+
+</div>
+
+{% else %}
+
+
+
+<div style="color:#888;">
+Selecciona un ticket para verlo.
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<h2>Roles</h2>
+
+<div class="card" style="padding:30px">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+
+<h3>Roles del sistema</h3>
+
+<a href="{% url 'create_role' %}" class="btn btn-primary">
+Crear rol
+</a>
+
+</div>
+
+<table class="table">
+
+<thead>
+<tr>
+<th style="width:200px">Rol</th>
+<th>Permisos</th>
+<th style="width:200px"></th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for role in roles %}
+
+<tr>
+
+<td>
+<strong>{{ role.name }}</strong>
+</td>
+
+<td>
+
+{% for p in role.permissions.all %}
+
+<span class="badge bg-info" style="margin-right:6px">
+{{ p.module }}:{{ p.action }}
+</span>
+
+{% empty %}
+
+<span style="color:#999">Sin permisos</span>
+
+{% endfor %}
+
+</td>
+
+<td>
+
+<a href="{% url 'edit_role' role.id %}" class="btn btn-primary">
+Editar permisos
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

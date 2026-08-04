@@ -1,0 +1,81 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Respaldo del sistema{% endblock %}
+{% block content %}
+
+<div class="card card-pad" style="margin-bottom:16px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px;">
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Usuarios</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.users }}</div>
+    </div>
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Tickets</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.tickets }}</div>
+    </div>
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Mensajes</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.messages }}</div>
+    </div>
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Adjuntos</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.attachments }}</div>
+    </div>
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Archivos media</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.media_files }}</div>
+    </div>
+    <div style="background:#f8fbfe;border:1px solid #dbe6ef;border-radius:12px;padding:10px 12px;">
+      <div class="small">Peso estimado media</div>
+      <div style="font-weight:900;font-size:22px;color:#0f172a;">{{ backup_stats.media_size }}</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:12px;padding:10px 12px;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;color:#334155;font-size:13px;">
+    Ultimo respaldo descargado:
+    {% if backup_stats.last_exported_at %}
+      <b>{{ backup_stats.last_exported_at }}</b>
+      ({{ backup_stats.last_exported_size }})
+    {% else %}
+      <b>Aun no generado en esta sesion</b>
+    {% endif %}
+    <br>
+    Ultimo respaldo importado:
+    {% if backup_stats.last_imported_at %}
+      <b>{{ backup_stats.last_imported_at }}</b>
+    {% else %}
+      <b>No registrado en esta sesion</b>
+    {% endif %}
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+    <div>
+      <div style="font-weight:900;">Respaldo completo</div>
+      <div class="small">Incluye usuarios, tickets, mensajes, historial, catalogos y archivos de media/adjuntos.</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <a class="btn secondary" href="{% url 'export_full_backup' %}" style="font-size:15px;padding:12px 18px;">Descargar Respaldo Completo (.zip)</a>
+      <form method="post" action="{% url 'import_full_backup' %}" enctype="multipart/form-data" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        {% csrf_token %}
+        <input class="input" type="file" name="backup_file" accept=".zip,application/zip" required style="max-width:250px;">
+        <button class="btn" type="submit">Importar Respaldo</button>
+      </form>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:4px;padding:12px;border:1px dashed #dbe6ef;border-radius:12px;background:#f8fbfe;">
+    <div>
+      <div style="font-weight:800;">Respaldo rapido de tickets (CSV)</div>
+      <div class="small">Util para migraciones ligeras solo de tickets.</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <a class="btn light" href="{% url 'export_tickets_csv' %}">Descargar CSV</a>
+      <form method="post" action="{% url 'import_tickets_csv' %}" enctype="multipart/form-data" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        {% csrf_token %}
+        <input class="input" type="file" name="tickets_file" accept=".csv,text/csv" required style="max-width:250px;">
+        <button class="btn light" type="submit">Importar CSV</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

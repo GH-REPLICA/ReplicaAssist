@@ -1,0 +1,78 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Editar Roles{% endblock %}
+{% block content %}
+
+<div class="card">
+
+<h2>Editar permisos: {{ role.name }}</h2>
+
+
+<form method="POST">    
+{% csrf_token %}
+
+{% for module, perms in modules.items %}
+
+<div style="margin-bottom:20px;">
+
+<label class="small">
+Nombre del rol
+</label>
+
+<input
+type="text"
+name="role_name"
+value="{{ role.name }}"
+class="input"
+>
+
+</div>
+
+
+<div class="card" style="margin-bottom:15px">
+
+<div class="card-header">
+<b>{{ module|title }}</b>
+</div>
+
+<div class="card-body">
+
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+
+{% for p in perms %}
+
+<label>
+
+<input
+type="checkbox"
+name="permissions"
+value="{{ p.id }}"
+
+{% if p in role.permissions.all %}
+checked
+{% endif %}
+
+>
+
+{{ p.module|title }} - {{ p.action|title }}
+
+</label>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+<button class="btn btn-primary">
+Guardar permisos
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

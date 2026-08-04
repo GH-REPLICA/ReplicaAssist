@@ -1,0 +1,42 @@
+{% extends "base_admin.html" %}
+
+{% block top_title %}Asignar soporte{% endblock %}
+
+{% block content %}
+
+<div class="card card-pad">
+
+<h3>Asignar soporte al ticket {{ ticket.code }}</h3>
+
+<form method="POST">
+{% csrf_token %}
+
+<label>Seleccionar agente</label>
+
+<select name="user_id" class="input">
+
+{% for s in supports %}
+<option value="{{ s.id }}">
+{{ s.username }}
+</option>
+{% endfor %}
+
+</select>
+
+<div style="margin-top:15px">
+
+<button class="btn">
+Asignar ticket
+</button>
+
+<a class="btn light" href="{% url 'ticket_detail' ticket.id %}">
+Cancelar
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}

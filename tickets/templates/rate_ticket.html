@@ -1,0 +1,131 @@
+{% extends "base_admin.html" %}
+
+{% block top_title %}
+Calificación
+{% endblock %}
+
+{% block content %}
+
+<div
+class="card card-pad"
+style="
+max-width:700px;
+margin:auto;
+"
+>
+
+<div style="
+font-size:28px;
+font-weight:900;
+margin-bottom:6px;
+">
+⭐ Calificar atención
+</div>
+
+<div
+class="small"
+style="
+margin-bottom:24px;
+font-size:14px;
+"
+>
+Tu feedback ayuda a mejorar la calidad del soporte.
+</div>
+
+<form method="POST">
+
+{% csrf_token %}
+
+{% if form.errors %}
+
+<div class="alert danger" style="margin-bottom:16px;">
+
+{% for field in form %}
+
+{% for error in field.errors %}
+<div>{{ error }}</div>
+{% endfor %}
+
+{% endfor %}
+
+{% for error in form.non_field_errors %}
+<div>{{ error }}</div>
+{% endfor %}
+
+</div>
+
+{% endif %}
+
+<!-- RATING -->
+
+<div style="margin-bottom:24px;">
+
+<label
+style="
+display:block;
+font-weight:700;
+margin-bottom:10px;
+"
+>
+Calificación
+</label>
+
+{{ form.rating }}
+
+</div>
+
+<!-- COMMENT -->
+
+<div style="margin-bottom:24px;">
+
+<label
+style="
+display:block;
+font-weight:700;
+margin-bottom:10px;
+"
+>
+Comentario
+</label>
+
+{{ form.rating_comment }}
+
+<div
+class="small"
+style="
+margin-top:8px;
+"
+>
+Cuéntanos cómo fue la atención recibida.
+</div>
+
+</div>
+
+<!-- ACTIONS -->
+
+<div
+style="
+display:flex;
+gap:12px;
+justify-content:flex-end;
+"
+>
+
+<a
+class="btn light"
+href="{% url 'ticket_detail' ticket.id %}"
+>
+Volver
+</a>
+
+<button class="btn" type="submit">
+Enviar calificación
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReplicaAssist</title>
+    <style>
+        :root {
+            --primary: #2b98b3;
+            --primary-dark: #257f96;
+            --surface: #ffffff;
+            --surface-muted: #f8fafc;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --shadow: 0 18px 40px rgba(15,23,42,0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f4f6f9;
+            color: var(--text);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            padding: 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 14px 16px;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 16px;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background: #f1f5f9;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 40px 36px;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 22px 18px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            .sidebar a {
+                padding: 12px 14px;
+            }
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .topbar h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 18px;
+            border-radius: 16px;
+            border: none;
+            background: var(--primary);
+            color: #ffffff;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            background: var(--primary-dark);
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <a href="/">Inicio</a>
+    <a href="/">Tickets</a>
+    {% if request.user.profile.role == "ADMIN" %}
+        <a href="/admin/">Panel Admin</a>
+    {% endif %}
+    <a href="/logout/">Salir</a>
+</div>
+
+<div class="content">
+    <div class="topbar">
+        <h2>{% block title %}{% endblock %}</h2>
+        <div>
+            {{ request.user.username }} ({{ request.user.profile.role }})
+        </div>
+    </div>
+
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+
+<div class="card" style="padding:30px">
+
+<h2>Crear rol</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Nombre del rol</label>
+
+<input type="text" name="name" class="form-control" required>
+
+<br>
+
+<button class="btn btn-primary">
+Crear rol
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

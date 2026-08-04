@@ -1,0 +1,26 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Soporte{% endblock %}
+{% block content %}
+
+<div class="card card-pad">
+  <div style="font-weight:900;font-size:20px;margin-bottom:10px;">Carga de trabajo (tickets abiertos)</div>
+  <div class="small" style="margin-bottom:10px;">La asignación automática elige al agente con menos tickets abiertos.</div>
+
+  <table class="table">
+    <thead>
+      <tr><th>Agente</th><th>Tickets abiertos</th></tr>
+    </thead>
+    <tbody>
+      {% for s, count in rows %}
+        <tr>
+          <td><b>{{ s.username }}</b></td>
+          <td>{{ count }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="2">No hay agentes de soporte.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

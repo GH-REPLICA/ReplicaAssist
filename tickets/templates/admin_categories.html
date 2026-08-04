@@ -1,0 +1,66 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Categorías{% endblock %}
+
+{% block content %}
+
+<div class="card card-pad">
+
+<h2>Crear Categoría</h2>
+
+<form method="POST" style="display:flex; gap:10px;">
+{% csrf_token %}
+
+<input type="hidden" name="action" value="create_category">
+
+<input type="text" name="name" placeholder="Nombre categoría" required>
+<input type="text" name="description" placeholder="Descripción">
+
+<button class="btn">Crear</button>
+
+</form>
+
+</div>
+
+
+<br>
+
+
+{% for category in categories %}
+
+<div class="card card-pad">
+
+<h3>{{ category.name }}</h3>
+<p class="small">{{ category.description }}</p>
+
+<h4>Subcategorías</h4>
+
+<ul>
+
+{% for sub in category.subcategories.all %}
+<li>{{ sub.name }}</li>
+{% empty %}
+<li class="small">No hay subcategorías</li>
+{% endfor %}
+
+</ul>
+
+<form method="POST" style="display:flex; gap:10px;">
+
+{% csrf_token %}
+
+<input type="hidden" name="action" value="create_subcategory">
+<input type="hidden" name="category_id" value="{{ category.id }}">
+
+<input type="text" name="subcategory_name" placeholder="Nueva subcategoría" required>
+
+<button class="btn">Agregar</button>
+
+</form>
+
+</div>
+
+<br>
+
+{% endfor %}
+
+{% endblock %}

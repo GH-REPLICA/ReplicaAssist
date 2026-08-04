@@ -1,0 +1,59 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Panel de Administración{% endblock %}
+{% block content %}
+
+<div class="grid grid-4">
+  <div class="card card-pad">
+    <div style="font-size:30px;font-weight:900;color:#2b98b3;">{{ total }}</div>
+    <div class="small">Total tickets</div>
+  </div>
+  <div class="card card-pad">
+    <div style="font-size:30px;font-weight:900;color:#2b98b3;">{{ nuevos }}</div>
+    <div class="small">Nuevos</div>
+  </div>
+  <div class="card card-pad">
+    <div style="font-size:30px;font-weight:900;color:#2b98b3;">{{ en_proceso }}</div>
+    <div class="small">En proceso</div>
+  </div>
+  <div class="card card-pad" style="background:#fef2f2; border-color:#fecaca;">
+    <div style="font-size:30px;font-weight:900;color:#b91c1c;">{{ breached }}</div>
+    <div class="small">SLA vencidos</div>
+  </div>
+</div>
+
+<div class="card card-pad" style="margin-top:16px;">
+  <div style="font-weight:900;margin-bottom:10px;">Últimos tickets (vista rápida)</div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Código</th><th>Título</th><th>Estado</th><th>Prioridad</th><th>Severidad</th><th>Asignado</th><th>SLA</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tickets %}
+        <tr {% if t.is_sla_breached %}style="background:#fee2e2;"{% endif %}>
+          <td><b>{{ t.code }}</b></td>
+          <td>{{ t.title }}</td>
+          <td><span class="pill">{{ t.status }}</span></td>
+          <td>{{ t.priority }}</td>
+          <td>{{ t.severity }}</td>
+          <td>{% if t.assigned_to %}{{ t.assigned_to.username }}{% else %}-{% endif %}</td>
+          <td>
+            {% if t.is_sla_breached %}<span class="pill red">Vencido</span>
+            {% else %}<span class="pill green">OK</span>
+            {% endif %}
+          </td>
+          <td><a class="btn light" href="{% url 'ticket_detail' t.id %}">Ver</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">No hay tickets</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div style="margin-top:12px;">
+    <a class="btn" href="{% url 'admin_tickets' %}">📋 Ir a Gestión Tickets</a>
+  </div>
+</div>
+
+{% endblock %}

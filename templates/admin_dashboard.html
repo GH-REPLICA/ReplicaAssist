@@ -1,0 +1,57 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+
+<div class="topbar">
+    <h1>Panel Administrativo</h1>
+</div>
+
+<div class="cards">
+    <div class="card">
+        <h3>{{ total }}</h3>
+        <p>Total Tickets</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ nuevos }}</h3>
+        <p>Nuevos</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ en_proceso }}</h3>
+        <p>En proceso</p>
+    </div>
+
+    <div class="card">
+        <h3>{{ cerrados }}</h3>
+        <p>Cerrados</p>
+    </div>
+</div>
+<div class="table-container">
+<table>
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Título</th>
+            <th>Empresa</th>
+            <th>Estado</th>
+            <th>Asignado</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.code }}</td>
+            <td>{{ ticket.title }}</td>
+            <td>{{ ticket.company }}</td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.assigned_to }}</td>
+            <td><a class="btn" href="#">Gestionar</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+{% endblock %}

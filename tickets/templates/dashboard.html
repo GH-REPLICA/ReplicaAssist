@@ -1,0 +1,210 @@
+{% extends "base_admin.html" %}
+
+{% block top_title %}
+Resumen general
+{% endblock %}
+
+{% block content %}
+
+<div class="grid grid-4" style="margin-top:16px;">
+
+    <a href="{% url 'admin_tickets' %}"
+       class="card card-pad clickable-card">
+
+        <div class="summary-value">
+            {{ total }}
+        </div>
+
+        <div class="small">
+            Total
+        </div>
+
+    </a>
+
+    <a href="{% url 'admin_tickets' %}?status=EN_PROCESO"
+       class="card card-pad clickable-card">
+
+        <div class="summary-value">
+            {{ en_proceso }}
+        </div>
+
+        <div class="small">
+            En proceso
+        </div>
+
+    </a>
+
+    <a href="{% url 'admin_tickets' %}?status=CERRADO"
+        class="card card-pad clickable-card">
+
+        <div class="summary-value">
+            {{ cerrados }}
+        </div>
+
+        <div class="small">
+            Cerrados
+        </div>
+
+    </a>
+
+    {% if role != "CLIENTE" %}
+
+    <a
+    href="{% url 'admin_tickets' %}?sla=breached"
+    class="card card-pad clickable-card">
+
+        <div class="summary-value">
+            {{ breached }}
+        </div>
+
+        <div class="small">
+            SLA vencidos
+        </div>
+
+    </a>
+
+    {% endif %}
+
+</div>
+
+<div class="card card-pad" style="margin-top:20px;">
+
+    <div style="font-size:20px;font-weight:900;margin-bottom:10px;">
+        Últimos tickets
+    </div>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Título</th>
+                <th>Estado</th>
+                <th>Empresa</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for t in tickets|slice:":8" %}
+
+            <tr>
+
+                <td>
+                    <b>{{ t.code }}</b>
+                </td>
+
+                <td>
+                    {{ t.title }}
+                </td>
+
+                <td>
+                    <span class="pill">
+                        {{ t.status }}
+                    </span>
+                </td>
+
+                <td>
+                    {% if t.company %}
+                        {{ t.company.name }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+
+                <td>
+                    <a class="btn small"
+                       href="{% url 'ticket_detail' t.id %}">
+                        Ver
+                    </a>
+                </td>
+
+            </tr>
+
+        {% empty %}
+
+            <tr>
+                <td colspan="5">
+                    No hay tickets
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="card card-pad" style="margin-top:20px;">
+
+    <div style="font-size:20px;font-weight:900;margin-bottom:10px;">
+        Mis Tickets
+    </div>
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+                <th>Código</th>
+                <th>Título</th>
+                <th>Estado</th>
+
+                {% if role == "ADMINISTRADOR" %}
+                    <th>Prioridad</th>
+                {% endif %}
+
+                <th></th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for t in tickets %}
+
+            <tr>
+
+                <td>{{ t.code }}</td>
+
+                <td>{{ t.title }}</td>
+
+                <td>
+                    <span class="pill">
+                        {{ t.status }}
+                    </span>
+                </td>
+
+                {% if role == "ADMINISTRADOR" %}
+                    <td>{{ t.priority }}</td>
+                {% endif %}
+
+                <td>
+                    <a class="btn small"
+                       href="{% url 'ticket_detail' t.id %}">
+                        Ver
+                    </a>
+                </td>
+
+            </tr>
+
+        {% empty %}
+
+            <tr>
+                <td colspan="6">
+                    No tienes tickets aún.
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

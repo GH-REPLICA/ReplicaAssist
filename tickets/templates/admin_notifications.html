@@ -1,0 +1,27 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Notificaciones{% endblock %}
+{% block content %}
+
+<div class="card card-pad">
+  <div style="font-weight:900;font-size:20px;margin-bottom:10px;">Tus notificaciones</div>
+  <table class="table">
+    <thead>
+      <tr><th>Estado</th><th>Título</th><th>Detalle</th><th>Fecha</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for n in notifs %}
+        <tr>
+          <td>{% if n.is_read %}<span class="pill">Leído</span>{% else %}<span class="pill blue">Nuevo</span>{% endif %}</td>
+          <td><b>{{ n.title }}</b></td>
+          <td>{{ n.body }}</td>
+          <td>{{ n.created_at|date:"d/m/Y H:i" }}</td>
+          <td><a class="btn light" href="{% url 'notification_read' n.id %}">Abrir</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No hay notificaciones</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

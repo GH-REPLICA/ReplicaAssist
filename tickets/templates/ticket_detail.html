@@ -1,0 +1,1702 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Ticket{% endblock %}
+{% block content %}
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    font-family:"Inter","Segoe UI",sans-serif;
+}
+
+.helpdesk-page {
+    display: grid;
+    gap: 24px;
+    padding: 0;
+}
+.page-header {
+    display: grid;
+    gap: 16px;
+}
+.header-main{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+}
+.header-copy {
+    display: grid;
+    gap: 10px;
+}
+.header-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-top:8px;
+}
+.ticket-title {
+    margin: 0;
+    font-size: 1.7rem;
+    line-height: 1.1;
+    font-weight: 800;
+    color: #0f172a;
+    overflow-wrap: anywhere;
+}
+.ticket-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.status-pill,
+.info-badge,
+.info-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: #2b98b3;
+}
+.info-pill {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+.info-pill.green {
+    background: #d1fae5;
+    color: #065f46;
+}
+.info-pill.red {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.info-pill.blue {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 20px;
+    align-items: stretch;
+}
+.info-card {
+    height: 100%;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-card,
+.chat-card,
+.description-card,
+.sidebar-card,
+.timeline-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+    padding: 24px;
+}
+.card-heading,
+.chat-card-heading {
+    margin: 0 0 16px;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    color: #0f172a;
+}
+.info-card dl {
+    display: grid;
+    gap: 12px;
+}
+.info-card dt {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+.info-card dd {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+.info-card .info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+}
+.chat-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) 360px;
+    gap: 24px;
+    align-items: start;
+}
+.chat-box {
+    height: 420px;
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: auto;
+}
+.chat-message {
+    max-width: 88%;
+    display: grid;
+    gap: 10px;
+    padding: 16px 18px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(15, 23, 42, 0.08);
+    line-height: 1.7;
+}
+.chat-message-incoming {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 6px;
+}
+.chat-message-outgoing {
+    align-self: flex-end;
+    background: #2b98b3;
+    color: #ffffff;
+    border-bottom-right-radius: 6px;
+}
+.chat-message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+.chat-message-time {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+.chat-message-body {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.chat-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.16);
+    color: inherit;
+    text-decoration: none;
+}
+.chat-file a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+.message-form-panel {
+    display: grid;
+    gap: 18px;
+}
+.form-field {
+    display: grid;
+}
+
+#id_message {
+    width: 100%;
+    min-height: 110px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 12px 14px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+#id_message:focus {
+    border-color: #2b98b3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(43,152,179,.15);
+}
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+.form-actions .input {
+    flex: 1;
+    min-width: 220px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 10px;
+    background: #fff;
+}
+.form-note {
+    font-size: 0.92rem;
+    color: #64748b;
+}
+.btn {
+    border: none;
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+.btn:hover {
+    transform: translateY(-1px);
+}
+.btn-primary {
+    background: #2b98b3;
+    color: #ffffff;
+}
+.btn-secondary {
+    background: #f8fafc;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+}
+.btn-danger {
+    background: #dc2626;
+    color: #ffffff;
+}
+.btn-block {
+    width: 100%;
+}
+.alert-panel {
+    border-radius: 18px;
+    background: #fef3c7;
+    border: 1px solid #facc15;
+    padding: 18px;
+    color: #92400e;
+}
+.description-card .description-body {
+    white-space: pre-wrap;
+    color: #334155;
+    font-size: 0.98rem;
+    line-height: 1.8;
+}
+.attachment-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+}
+.attachment-list li {
+    border-radius: 16px;
+    background: #f8fafc;
+    padding: 12px 14px;
+}
+.attachment-list a {
+    color: #2b98b3;
+    font-weight: 700;
+    text-decoration: none;
+}
+.detail-list {
+    margin-top: 16px;
+    display: grid;
+    gap: 12px;
+}
+.detail-list > div {
+    display: grid;
+    gap: 8px;
+}
+.attachment-section {
+    margin-top: 22px;
+}
+.attachment-heading {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: #334155;
+}
+.timer-value {
+    font-size: 1.15rem;
+    margin-bottom: 12px;
+}
+.timer-label {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+.info-section-grid {
+    display: grid;
+    gap: 18px;
+}
+.progress-track {
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #22c55e;
+    transition: width 0.24s ease, background 0.24s ease;
+}
+.required-mark {
+    color: #dc2626;
+}
+.hidden {
+    display: none !important;
+}
+.sla-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+.timeline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+}
+.timeline-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: flex-start;
+}
+.timeline-marker {
+    width: 12px;
+    min-width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: #2b98b3;
+    box-shadow: 0 0 0 8px rgba(43, 152, 179, 0.12);
+    margin-top: 6px;
+}
+.timeline-content {
+    display: grid;
+    gap: 6px;
+}
+.timeline-date {
+    font-size: 0.82rem;
+    color: #64748b;
+}
+.timeline-title {
+    font-weight: 700;
+    color: #0f172a;
+}
+.timeline-detail {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #475569;
+}
+.timeline-empty {
+    color: #64748b;
+    font-style: italic;
+}
+.sidebar-card {
+    display: grid;
+    gap: 16px;
+}
+.sidebar-column{
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    display: grid;
+    gap: 28px;
+}
+.rating-score {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #f59e0b;
+    margin: 0;
+}
+.rating-note {
+    color: #475569;
+    font-size: 0.95rem;
+}
+.sidebar-actions {
+    display: grid;
+    gap: 16px;
+}
+.close-ticket-form label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+.close-ticket-form textarea {
+    width: 100%;
+    min-height: 110px;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    padding: 14px 16px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+.close-ticket-form small {
+    color: #64748b;
+}
+@media (max-width: 1120px) {
+    .chat-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-column {
+        position: static;
+    }
+}
+@media (max-width: 1080px) {
+    .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+@media (max-width: 900px) {
+    .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 720px) {
+    .header-main {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .ticket-title {
+        font-size: 1.6rem;
+    }
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .btn-primary,
+    .btn-purple,
+    .close-ticket-actions .btn,
+    .ticket-action-manage .btn {
+        width: 100%;
+        min-width: 0;
+    }
+    .chat-box {
+        height: auto;
+        min-height: 320px;
+        max-height: 65vh;
+    }
+    .modal-card {
+        width: 94vw;
+        padding: 20px;
+        border-radius: 18px;
+    }
+    .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .helpdesk-page {
+        gap: 16px;
+    }
+    .info-card,
+    .chat-card,
+    .description-card,
+    .sidebar-card,
+    .timeline-card {
+        border-radius: 16px;
+        padding: 16px;
+    }
+    .ticket-title {
+        font-size: 1.28rem;
+        line-height: 1.2;
+    }
+    .status-pill,
+    .info-badge,
+    .info-pill {
+        padding: 7px 10px;
+        font-size: 0.78rem;
+        gap: 6px;
+    }
+    .chat-message {
+        max-width: 100%;
+        padding: 12px 14px;
+        border-radius: 14px;
+    }
+    .chat-box {
+        padding: 14px;
+        min-height: 280px;
+    }
+    .modal-actions {
+        flex-direction: column;
+    }
+    .modal-actions .btn {
+        width: 100%;
+    }
+}
+
+.ticket-action-card textarea{
+    min-height: 110px;
+    width: 100%;
+}
+
+.ticket-action-card small{
+    display: block;
+    margin-top: -4px;
+}
+
+.ticket-action-manage .btn {
+    width: auto;
+    min-width: 180px;
+}
+
+.close-ticket-form {
+    display: grid;
+    gap: 12px;
+}
+
+.close-ticket-actions .btn {
+    min-width: 180px;
+}
+
+.conversation-column {
+    display: grid;
+    gap: 24px;
+}
+
+.rating-full-card {
+    display: grid;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.rating-full-card .rating-score {
+    font-size: 2.2rem;
+}
+
+.rating-full-card .btn {
+    width: fit-content;
+}
+
+.timer-value {
+    display: block;
+    padding: 8px 0;
+}
+
+.timer-value[style*="220, 38, 38"],
+.timer-value[style*="#dc2626"] {
+    font-weight: 800;
+}
+.sla-detail {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+.sla-overdue {
+    color: #dc2626 !important;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.btn-purple{
+    background:#6f3c8f;
+    color:#fff;
+}
+
+.btn-purple:hover{
+    background:#5d2f7b;
+    box-shadow:0 10px 20px rgba(111,60,143,.25);
+}
+
+.btn-primary,
+.btn-purple{
+
+    height:46px;
+
+    min-width:185px;
+
+    padding:0 22px;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:14px;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+    text-decoration:none;
+
+}
+
+/* ================= MODAL ================= */
+
+.modal-overlay{
+
+position:fixed;
+
+inset:0;
+
+background:rgba(15,23,42,.55);
+
+backdrop-filter:blur(4px);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+z-index:9999;
+
+animation:fadeIn .25s;
+
+}
+.modal-card{
+
+width:min(520px,92vw);
+
+background:#fff;
+
+border-radius:24px;
+
+padding:28px;
+
+box-shadow:0 30px 80px rgba(0,0,0,.25);
+
+display:flex;
+
+flex-direction:column;
+
+gap:18px;
+
+animation:scaleIn .25s;
+
+}
+
+.modal-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:8px;
+
+}
+
+.modal-title{
+
+margin:0;
+
+font-size:1.35rem;
+
+font-weight:800;
+
+color:#0f172a;
+
+}
+
+.modal-close{
+
+border:none;
+
+background:none;
+
+font-size:28px;
+
+cursor:pointer;
+
+color:#64748b;
+
+transition:.2s;
+
+}
+
+.modal-close:hover{
+
+color:#dc2626;
+
+}
+
+.modal-description{
+
+color:#64748b;
+
+line-height:1.6;
+
+}
+
+.modal-actions{
+
+display:flex;
+
+justify-content:flex-end;
+
+gap:12px;
+
+margin-top:12px;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+}
+
+to{
+
+opacity:1;
+
+}
+
+}
+
+@keyframes scaleIn{
+
+from{
+
+opacity:0;
+
+transform:scale(.94);
+
+}
+
+to{
+
+opacity:1;
+
+transform:scale(1);
+
+}
+
+}
+.modal-card textarea{
+
+width:100%;
+
+min-height:140px;
+
+padding:16px;
+
+border-radius:16px;
+
+border:1px solid #cbd5e1;
+
+font-size:.95rem;
+
+resize:vertical;
+
+margin-top:10px;
+
+}
+
+.modal-card textarea:focus{
+
+outline:none;
+
+border-color:#2b98b3;
+
+box-shadow:0 0 0 4px rgba(43,152,179,.15);
+
+}
+</style>
+
+<div class="helpdesk-page">
+    <section class="page-header">
+        <div class="header-main">
+            <div class="header-copy">
+                <div class="ticket-meta-row">
+                    <span class="info-pill blue">Ticket</span>
+                    <span id="ticket-status" class="status-pill">{{ ticket.get_status_display }}</span>
+                </div>
+                <h1 class="ticket-title">{{ ticket.code }} — {{ ticket.title }}</h1>
+                <div class="ticket-meta-row">
+                    <span class="info-pill blue">Prioridad: {{ ticket.get_priority_display }}</span>
+                    <span class="info-pill">Severidad: {{ ticket.get_severity_display }}</span>
+                </div>
+            </div>
+            <div class="header-actions">
+
+                {% if role != "CLIENTE" and ticket.status != "CERRADO" %}
+
+                    <a href="{% url 'update_status' ticket.id %}"
+                    class="btn btn-primary">
+
+                        🛠 Gestionar ticket
+
+                    </a>
+
+                    <button
+                        type="button"
+                        class="btn btn-purple"
+                        id="open-close-ticket-modal">
+
+                        🔒 Cerrar ticket
+
+                    </button>
+
+                {% endif %}
+
+            </div>
+        </div>
+
+        {% if business_message %}
+        <div id="business-message" class="alert-panel">
+            {{ business_message }}
+        </div>
+        {% else %}
+        <div id="business-message" class="hidden"></div>
+        {% endif %}
+    </section>
+
+    <section class="card-grid">
+        <article class="info-card">
+            <h2 class="card-heading">Cliente</h2>
+            <dl>
+                <div>
+                    <dt>Nombre</dt>
+                    <dd>{{ ticket.created_by.get_full_name|default:ticket.created_by.username }}</dd>
+                </div>
+                {% if ticket.created_by.email %}
+                <div>
+                    <dt>Correo</dt>
+                    <dd><a href="mailto:{{ ticket.created_by.email }}">{{ ticket.created_by.email }}</a></dd>
+                </div>
+                {% endif %}
+                {% if ticket.created_by.profile.phone %}
+                <div>
+                    <dt>Celular</dt>
+                    <dd><a href="tel:{{ ticket.created_by.profile.phone }}">{{ ticket.created_by.profile.phone }}</a></dd>
+                </div>
+                {% endif %}
+                {% if ticket.company %}
+                <div>
+                    <dt>Empresa</dt>
+                    <dd>{{ ticket.company.name }}</dd>
+                </div>
+                {% endif %}
+            </dl>
+        </article>
+
+        <article class="info-card">
+            <h2 class="card-heading">Agente de soporte</h2>
+            <dl>
+                <div>
+                    <dt>Responsable</dt>
+                    <dd id="ticket-assigned">
+                        {% if ticket.assigned_to %}
+                            {{ ticket.assigned_to.get_full_name|default:ticket.assigned_to.username }}
+                        {% else %}
+                            Por asignar (tiempo máximo 20 min)
+                        {% endif %}
+                    </dd>
+                </div>
+                {% if ticket.assigned_to and ticket.assigned_to.email %}
+                <div>
+                    <dt>Correo</dt>
+                    <dd id="ticket-assigned-email"><a href="mailto:{{ ticket.assigned_to.email }}">{{ ticket.assigned_to.email }}</a></dd>
+                </div>
+                {% else %}
+                <div>
+                    <dt></dt>
+                    <dd id="ticket-assigned-email"></dd>
+                </div>
+                {% endif %}
+                {% if ticket.assigned_to and ticket.assigned_to.profile.phone %}
+                <div>
+                    <dt>Teléfono</dt>
+                    <dd id="ticket-assigned-phone"><a href="tel:{{ ticket.assigned_to.profile.phone }}">{{ ticket.assigned_to.profile.phone }}</a></dd>
+                </div>
+                {% else %}
+                <div>
+                    <dt></dt>
+                    <dd id="ticket-assigned-phone"></dd>
+                </div>
+                {% endif %}
+            </dl>
+        </article>
+
+        <article class="info-card">
+            <h2 class="card-heading">Resumen del ticket</h2>
+            <dl>
+                <div>
+                    <dt>Creado</dt>
+                    <dd>{{ ticket.created_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                <div>
+                    <dt>Actualizado</dt>
+                    <dd>{{ ticket.updated_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                <div>
+                    <dt>Vencimiento SLA</dt>
+                    <dd>{% if ticket.sla_due_at %}{{ ticket.sla_due_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd>
+                </div>
+            </dl>
+        </article>
+
+        <article class="info-card">
+            <h2 class="card-heading">SLA</h2>
+            <div class="info-row sla-pill-row">
+                {% if ticket.is_sla_breached %}
+                <span class="info-pill red">SLA vencido</span>
+                {% else %}
+                <span class="info-pill green">SLA OK</span>
+                {% endif %}
+                {% if ticket.status == "CERRADO" %}
+                <span class="info-pill green">Cerrado</span>
+                {% endif %}
+            </div>
+            <dl class="detail-list">
+                <div>
+                    <dt>Primera respuesta</dt>
+                    <dd>{% if ticket.first_response_due_at %}{{ ticket.first_response_due_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd>
+                </div>
+                {% if ticket.first_responded_at %}
+                <div>
+                    <dt>Primera respuesta real</dt>
+                    <dd>{{ ticket.first_responded_at|date:"d/m/Y H:i" }}</dd>
+                </div>
+                {% endif %}
+                <div>
+                    <dt>Resolución</dt>
+                    <dd>{% if ticket.sla_due_at %}{{ ticket.sla_due_at|date:"d/m/Y H:i" }}{% else %}-{% endif %}</dd>
+                </div>
+            </dl>
+        </article>
+    </section>
+
+    <section class="description-card">
+        <h2 class="card-heading">Descripción</h2>
+        <div class="description-body">{{ ticket.description }}</div>
+        {% if ticket.attachments.all %}
+        <div class="attachment-section">
+            <div class="attachment-heading">📎 Evidencias adjuntas</div>
+            <ul class="attachment-list">
+                {% for file in ticket.attachments.all %}
+                    {% if not file.message %}
+                    <li>
+                        <a href="{% url 'view_attachment' file.id %}">Ver archivo</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if role != "CLIENTE" and ticket.status != "CERRADO" %}
+
+    <div id="close-ticket-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 class="modal-title">Cerrar ticket</h2>
+                <button type="button" class="modal-close" id="close-ticket-modal-x">×</button>
+            </div>
+
+            <p class="modal-description">
+                Ingresa el comentario de cierre. Este comentario será visible en el historial del ticket.
+            </p>
+
+            <form method="POST" action="{% url 'close_ticket' ticket.id %}" class="close-ticket-form">
+                {% csrf_token %}
+
+                <label>
+                    Comentario de cierre <span class="required-mark">*</span>
+                </label>
+
+                <textarea
+                    name="comment"
+                    class="input"
+                    required
+                    placeholder="Describe la solución aplicada y el motivo del cierre del ticket"></textarea>
+
+                <label style="display:flex;gap:10px;align-items:flex-start;">
+                    <input type="checkbox" name="customer_confirmation" value="1" required style="margin-top:4px;">
+                    <span>Confirmo que el cliente dio su conformidad para cerrar el ticket. <span class="required-mark">*</span></span>
+                </label>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-close-ticket">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="btn btn-purple">
+                        Confirmar cierre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <section class="chat-layout">
+        <div class="conversation-column">
+        <div class="chat-card">
+            <h2 class="chat-card-heading">Conversación</h2>
+            <div id="chat-box" class="chat-box">
+                {% for m in ticket.messages.all|dictsort:"created_at" %}
+                {% if not m.is_internal %}
+                <div class="chat-message {% if m.author == request.user %}chat-message-outgoing{% else %}chat-message-incoming{% endif %}">
+                    <div class="chat-message-header">
+                        <span>{{ m.author.get_full_name|default:m.author.username }}</span>
+                        <span class="chat-message-time">{{ m.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="chat-message-body">{{ m.message }}</div>
+                    {% for file in m.files.all %}
+                    <div class="chat-file">
+                        📎 <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|cut:"ticket_files/" }}</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% empty %}
+                <div class="timeline-empty">No hay mensajes aún.</div>
+                {% endfor %}
+            </div>
+
+            <div id="ticket-actions" class="message-form-panel">
+                <form id="ticket-message-form" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-field">
+                        {{ msg_form.message }}
+                    </div>
+                    <div class="form-actions">
+                        <input type="file" name="file" class="input">
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </div>
+                </form>
+                <div id="closed-ticket-warning" class="alert-panel{% if ticket.status != 'CERRADO' %} hidden{% endif %}">
+                    🔒 Este ticket está cerrado. No puedes enviar mensajes.
+                </div>
+            </div>
+        </div>
+
+            {% if ticket.status == "CERRADO" or ticket.rating %}
+            <section class="description-card rating-full-card">
+                <h2 class="card-heading">Calificación del servicio</h2>
+
+                {% if ticket.rating %}
+                    <p class="rating-score">⭐ {{ ticket.rating }}/5</p>
+
+                    {% if ticket.rating_comment %}
+                    <p class="rating-note">{{ ticket.rating_comment }}</p>
+                    {% endif %}
+
+                {% elif ticket.status == "CERRADO" and role == "CLIENTE" and not ticket.rating %}
+                    <div class="rating-note">
+                        Gracias por usar el servicio. Tu opinión ayuda a mejorar el soporte.
+                    </div>
+
+                    <a href="{% url 'rate_ticket' ticket.id %}" class="btn btn-primary">
+                        Calificar atención ⭐
+                    </a>
+
+                {% else %}
+                    <div class="rating-note">
+                        El cliente aún no ha registrado una calificación.
+                    </div>
+                {% endif %}
+            </section>
+            {% endif %}
+        </div>
+
+        <aside class="sidebar-column">
+
+            {% if role != "CLIENTE" and ticket.status != "CERRADO" %}
+            <section class="timeline-card">
+                <h2 class="card-heading">SLA en tiempo real</h2>
+                <div class="info-section-grid">
+                    {% if ticket.first_responded_at %}
+                        {% if ticket.is_first_response_breached %}
+                        <div>
+                            <div class="info-pill red">⛔ Primera respuesta fuera de SLA</div>
+                            <div class="sla-detail">Límite: {{ ticket.first_response_due_at|date:"d/m/Y H:i" }}</div>
+                            <div class="sla-detail">Respondido: {{ ticket.first_responded_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        {% else %}
+                        <div>
+                            <div class="info-pill green">✔ Primera respuesta dentro de SLA</div>
+                            <div class="sla-detail">Límite: {{ ticket.first_response_due_at|date:"d/m/Y H:i" }}</div>
+                            <div class="sla-detail">Respondido: {{ ticket.first_responded_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        {% endif %}
+                    {% elif ticket.first_response_due_at %}
+                    <div>
+                        <div class="timer-label">
+                            Primera respuesta
+                        </div>
+
+                        <div class="sla-detail">
+                            Inicio:
+                            {{ first_response_start_at|date:"d/m/Y H:i" }}
+                        </div>
+
+                        <div class="sla-detail">
+                            Límite:
+                            {{ ticket.first_response_due_at|date:"d/m/Y H:i" }}
+                        </div>
+
+                        <div id="first-response-timer"
+                            class="card-heading timer-value"
+                            data-deadline="{{ ticket.first_response_due_at|date:'U' }}"
+                            data-start="{{ first_response_start_at|date:'U' }}">
+                            Cargando...
+                        </div>
+
+                        <div class="progress-track">
+                            <div id="sla_response_bar" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="timer-label">
+                            Resolución
+                        </div>
+
+                        
+                        <div class="sla-detail">
+                            Inicio:
+                            {% if resolution_start_at %}
+                                {{ resolution_start_at|date:"d/m/Y H:i" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+
+
+                        <div class="sla-detail">
+                            Límite:
+                            {{ ticket.sla_due_at|date:"d/m/Y H:i" }}
+                        </div>
+                        {% if ticket.status == "CERRADO" %}
+                        <div class="info-pill green">✔ Ticket cerrado</div>
+                        {% elif ticket.sla_due_at %}
+                        <div id="sla_resolution_timer" data-deadline="{{ ticket.sla_due_at|date:'U' }}" data-start="{% if resolution_start_at %}{{ resolution_start_at|date:'U' }}{% else %}{{ ticket.resolution_started_at|date:'U' }}{% endif %}" class="card-heading timer-value">Cargando...</div>
+                        <div class="progress-track">
+                            <div id="sla_resolution_bar" class="progress-fill"></div>
+                        </div>
+                        {% else %}
+                        <div class="info-pill">Esperando asignación</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if role != "CLIENTE"%}
+            <section class="timeline-card">
+                <h2 class="card-heading">Historial</h2>
+                <ul class="timeline-list">
+                    {% for h in ticket.history.all|dictsortreversed:"created_at" %}
+                    <li class="timeline-item">
+                        <span class="timeline-marker"></span>
+                        <div class="timeline-content">
+                            <div class="timeline-date">{{ h.created_at|date:"d/m/Y H:i" }}</div>
+                            <div class="timeline-title">
+                                {% if h.changed_by %}{{ h.changed_by.username }}{% else %}-{% endif %} —
+                                {% if h.field == "conformidad_cliente_cierre" %}
+                                    Conformidad del cliente
+                                {% else %}
+                                    {{ h.field }}
+                                {% endif %}
+                            </div>
+                            <div class="timeline-detail">
+                                {% if h.field == "conformidad_cliente_cierre" %}
+                                    {{ h.new_value }}
+                                {% else %}
+                                    <strong>Antes:</strong> {{ h.old_value }}<br><strong>Después:</strong> {{ h.new_value }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <div class="timeline-empty">No hay cambios registrados.</div>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+        </aside>
+    </section>
+</div>
+
+<script>
+
+const chat = document.getElementById("chat-box");
+const statusField = document.getElementById("ticket-status");
+const assignedField = document.getElementById("ticket-assigned");
+const assignedEmailField = document.getElementById("ticket-assigned-email");
+const assignedPhoneField = document.getElementById("ticket-assigned-phone");
+const statusJsonUrl = "{% url 'ticket_status_json' ticket.id %}";
+let lastUpdate = "{{ ticket.updated_at.isoformat }}";
+let currentStatusCode = "{{ ticket.status }}";
+let currentSlaPaused = "{{ ticket.sla_paused|yesno:'true,false' }}" === "true";
+let currentIsBusinessHour = "{{ is_business_hour|yesno:'true,false' }}" === "true";
+
+function businessSecondsBetween(startMs, endMs) {
+    if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) {
+        return 0;
+    }
+
+    const dayStartHour = 8;
+    const dayEndHour = 18;
+    let cursor = new Date(startMs);
+    let total = 0;
+
+    while (cursor.getTime() < endMs) {
+        const segmentStart = new Date(cursor);
+        const workStart = new Date(cursor);
+        workStart.setHours(dayStartHour, 0, 0, 0);
+        const workEnd = new Date(cursor);
+        workEnd.setHours(dayEndHour, 0, 0, 0);
+
+        const isWeekday = cursor.getDay() >= 1 && cursor.getDay() <= 5;
+
+        if (!isWeekday) {
+            cursor.setDate(cursor.getDate() + 1);
+            cursor.setHours(dayStartHour, 0, 0, 0);
+            continue;
+        }
+
+        if (segmentStart < workStart) {
+            cursor = workStart;
+            continue;
+        }
+
+        if (segmentStart >= workEnd) {
+            cursor.setDate(cursor.getDate() + 1);
+            cursor.setHours(dayStartHour, 0, 0, 0);
+            continue;
+        }
+
+        const segmentEnd = Math.min(workEnd.getTime(), endMs);
+        total += Math.max(0, Math.floor((segmentEnd - segmentStart.getTime()) / 1000));
+
+        if (segmentEnd >= endMs) {
+            break;
+        }
+
+        cursor.setTime(segmentEnd);
+        if (cursor >= workEnd) {
+            cursor.setDate(cursor.getDate() + 1);
+            cursor.setHours(dayStartHour, 0, 0, 0);
+        }
+    }
+
+    return total;
+}
+
+function nextBusinessStartMs(nowMs) {
+    const next = new Date(nowMs);
+    next.setSeconds(0, 0);
+
+    const day = next.getDay();
+    const hour = next.getHours();
+
+    if (day >= 1 && day <= 5 && hour < 8) {
+        next.setHours(8, 0, 0, 0);
+        return next.getTime();
+    }
+
+    next.setDate(next.getDate() + 1);
+    next.setHours(8, 0, 0, 0);
+
+    while (next.getDay() === 0 || next.getDay() === 6) {
+        next.setDate(next.getDate() + 1);
+        next.setHours(8, 0, 0, 0);
+    }
+
+    return next.getTime();
+}
+
+function formatDateTimeLocal(ms) {
+    const d = new Date(ms);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    const hour = String(d.getHours()).padStart(2, "0");
+    const minute = String(d.getMinutes()).padStart(2, "0");
+    return `${day}/${month}/${year} ${hour}:${minute}`;
+}
+
+function makeMessageCard(m) {
+  const wrapper = document.createElement("div");
+  wrapper.className = `chat-message ${m.own ? 'chat-message-outgoing' : 'chat-message-incoming'}`;
+
+  const header = document.createElement("div");
+  header.className = "chat-message-header";
+  header.innerHTML = `<div>${m.author}</div><div class="chat-message-time">${m.created_at}</div>`;
+  wrapper.appendChild(header);
+
+  const body = document.createElement("div");
+  body.className = "chat-message-body";
+  body.textContent = m.message;
+  wrapper.appendChild(body);
+
+  if (m.files && m.files.length) {
+    m.files.forEach(file => {
+      const f = document.createElement("div");
+      f.className = "chat-file";
+      f.innerHTML = `📎 <a href="${file.url}" target="_blank">${file.name}</a>`;
+      wrapper.appendChild(f);
+    });
+  }
+
+  return wrapper;
+}
+
+function renderMessages(messages) {
+  if (!chat) return;
+  chat.innerHTML = "";
+  if (messages.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "timeline-empty";
+    empty.textContent = "No hay mensajes aún.";
+    chat.appendChild(empty);
+    return;
+  }
+  messages.forEach(m => chat.appendChild(makeMessageCard(m)));
+  chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+}
+
+function refreshTicketData() {
+  fetch(statusJsonUrl, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) return;
+      if (data.updated_at === lastUpdate) return;
+      lastUpdate = data.updated_at;
+
+      if (statusField) {
+        statusField.textContent = data.status;
+      }
+            currentStatusCode = data.status_code;
+            currentSlaPaused = !!data.sla_paused;
+            currentIsBusinessHour = !!data.is_business_hour;
+
+            const resolutionTimer = document.getElementById("sla_resolution_timer");
+            const responseTimer = document.getElementById("first-response-timer");
+
+            if (resolutionTimer && data.sla_due_at) {
+                resolutionTimer.dataset.deadline = String(Math.floor(new Date(data.sla_due_at).getTime() / 1000));
+            }
+            if (responseTimer && data.first_response_due_at) {
+                responseTimer.dataset.deadline = String(Math.floor(new Date(data.first_response_due_at).getTime() / 1000));
+            }
+      if (assignedField) {
+                assignedField.textContent = data.assigned_to || "Por asignar (tiempo máximo 20 min)";
+      }
+      if (assignedEmailField) {
+        assignedEmailField.innerHTML = data.assigned_email ? `<b>Correo:</b> <a href="mailto:${data.assigned_email}">${data.assigned_email}</a>` : "";
+      }
+      if (assignedPhoneField) {
+        assignedPhoneField.innerHTML = data.assigned_phone ? `<b>Teléfono:</b> <a href="tel:${data.assigned_phone}">${data.assigned_phone}</a>` : "";
+      }
+
+      const businessMessage = document.getElementById("business-message");
+      if (businessMessage) {
+        if (data.business_message) {
+          businessMessage.innerHTML = data.business_message;
+          businessMessage.style.display = "block";
+        } else {
+          businessMessage.innerHTML = "";
+          businessMessage.style.display = "none";
+        }
+      }
+
+      const ticketActions = document.getElementById("ticket-actions");
+      const messageForm = document.getElementById("ticket-message-form");
+      const closedWarning = document.getElementById("closed-ticket-warning");
+      if (ticketActions) {
+        if (data.status_code === "CERRADO") {
+          if (closedWarning) {
+            closedWarning.style.display = "block";
+          }
+          if (messageForm) {
+            messageForm.style.display = "none";
+          }
+        } else {
+          if (closedWarning) {
+            closedWarning.style.display = "none";
+          }
+          if (messageForm) {
+            messageForm.style.display = "block";
+          }
+        }
+      }
+
+            if (data.status_code === "CERRADO") {
+        const resolutionBar = document.getElementById("sla_resolution_bar");
+        const responseBar = document.getElementById("sla_response_bar");
+
+        if (resolutionTimer) {
+          resolutionTimer.innerHTML = "✔ Ticket cerrado";
+          resolutionTimer.style.color = "#22c55e";
+        }
+        if (resolutionBar) {
+          resolutionBar.style.width = "100%";
+          resolutionBar.style.background = "#22c55e";
+        }
+        if (responseTimer) {
+          responseTimer.innerHTML = "✔ Ticket cerrado";
+          responseTimer.style.color = "#22c55e";
+        }
+        if (responseBar) {
+          responseBar.style.width = "100%";
+          responseBar.style.background = "#22c55e";
+        }
+      }
+
+      renderMessages(data.messages);
+    })
+    .catch(() => {
+      // No mostrar errores al usuario en polling.
+    });
+}
+
+const ticketActions = document.getElementById("ticket-actions");
+
+if (chat) {
+  chat.scrollTo({
+    top: chat.scrollHeight,
+    behavior: "smooth"
+  });
+
+  setInterval(refreshTicketData, 15000);
+  window.addEventListener("focus", refreshTicketData);
+}
+
+/* ================= SLA TIMER ================= */
+
+function startSLA(timerId, barId){
+
+const timer = document.getElementById(timerId)
+const bar = document.getElementById(barId)
+
+if(!timer) return
+
+function update(){
+
+  const deadlineRaw = timer.dataset.deadline
+  const startRaw = timer.dataset.start
+
+  if(!deadlineRaw || !startRaw){
+
+      timer.innerHTML = "Sin SLA"
+      timer.style.color = "#64748b"
+
+      if(bar){
+          bar.style.width = "0%"
+      }
+
+      return
+  }
+
+  const deadline = parseInt(deadlineRaw) * 1000
+  const start = parseInt(startRaw) * 1000
+
+  if(isNaN(deadline) || isNaN(start)){
+
+      timer.innerHTML = "Sin SLA"
+      timer.style.color = "#64748b"
+
+      if(bar){
+          bar.style.width = "0%"
+      }
+
+      return
+  }
+
+  const closed = currentStatusCode
+
+  if(closed === "CERRADO"){
+
+      timer.innerHTML = "✔ Ticket cerrado"
+      timer.style.color = "#22c55e"
+
+      if(bar){
+          bar.style.width = "100%"
+          bar.style.background = "#22c55e"
+      }
+      clearInterval(interval)
+      return
+      
+  }
+
+  if(currentSlaPaused){
+
+        timer.innerHTML = "⏸ SLA pausado"
+
+        if(currentStatusCode === "ESPERANDO_CLIENTE"){
+            timer.innerHTML += " - Esperando cliente"
+        }
+
+        if(currentStatusCode === "ESPERANDO_SOPORTE"){
+            timer.innerHTML += " - Esperando soporte"
+        }
+
+        timer.style.color = "#f59e0b"
+
+        if(bar){
+            bar.style.background = "#f59e0b"
+            bar.style.width = "100%"
+        }
+
+          return
+      }
+
+    if(!currentIsBusinessHour){
+
+          const resumeAt = nextBusinessStartMs(new Date().getTime());
+          const resumeText = formatDateTimeLocal(resumeAt);
+
+          timer.innerHTML = `⏸ SLA pausado - Fuera de horario o fin de semana (lunes a viernes, 08:00-18:00)<br><small>Se reanuda: ${resumeText}</small>`
+            timer.style.color = "#f59e0b"
+
+            const nowPaused = new Date().getTime()
+            const totalPaused = businessSecondsBetween(start, deadline)
+            const usedPaused = businessSecondsBetween(start, nowPaused)
+            const percentPaused = totalPaused > 0 ? Math.min((usedPaused / totalPaused) * 100, 100) : 0
+
+            if(bar){
+                    bar.style.width = percentPaused + "%"
+                    bar.style.background = "#f59e0b"
+            }
+
+            return
+    }
+
+const now = new Date().getTime()
+
+let total = businessSecondsBetween(start, deadline)
+let used = businessSecondsBetween(start, now)
+let remaining = total - used
+
+if (remaining <= 0) {
+
+    const overdue = now - deadline;
+
+    const overdueDays = Math.floor(overdue / (1000 * 60 * 60 * 24));
+    const overdueHours = Math.floor((overdue % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const overdueMinutes = Math.floor((overdue % (1000 * 60 * 60)) / (1000 * 60));
+    const overdueSeconds = Math.floor((overdue % (1000 * 60)) / 1000);
+
+    let overdueText = "";
+
+    if (overdueDays > 0) {
+        overdueText = `${overdueDays}d ${overdueHours}h ${overdueMinutes}m`;
+    } else if (overdueHours > 0) {
+        overdueText = `${overdueHours}h ${overdueMinutes}m ${overdueSeconds}s`;
+    } else {
+        overdueText = `${overdueMinutes}m ${overdueSeconds}s`;
+    }
+
+    timer.innerHTML = `⛔ SLA vencido hace ${overdueText}`;
+    timer.style.color = "#dc2626";
+    timer.classList.add("sla-overdue");
+
+    if (bar) {
+        bar.style.width = "100%";
+        bar.style.background = "#dc2626";
+    }
+
+    return;
+}
+
+let percent = Math.min((used / total) * 100, 100)
+
+if(bar){
+
+    bar.style.width = percent + "%"
+
+    if(percent > 80){
+        bar.style.background = "#dc2626"
+    }
+    else if(percent > 60){
+        bar.style.background = "#f59e0b"
+    }
+    else{
+        bar.style.background = "#22c55e"
+    }
+}
+
+let h = Math.floor(remaining / (60*60))
+let m = Math.floor((remaining % (60*60)) / 60)
+let s = Math.floor(remaining % 60)
+
+timer.innerHTML = `${h}h ${m}m ${s}s`
+
+}
+
+const interval = setInterval(update,1000)
+
+update()
+
+}
+
+/* ================= MODAL ================= */
+
+const modal = document.getElementById("close-ticket-modal");
+const openModal = document.getElementById("open-close-ticket-modal");
+const closeModal = document.getElementById("close-ticket-modal-x");
+const cancelModal = document.getElementById("cancel-close-ticket");
+
+if (modal && openModal) {
+
+    openModal.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+    });
+
+    closeModal?.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+
+    cancelModal?.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.classList.add("hidden");
+        }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            modal.classList.add("hidden");
+        }
+    });
+
+}
+
+startSLA(
+"sla_resolution_timer",
+"sla_resolution_bar"
+)
+
+startSLA(
+"first-response-timer",
+"sla_response_bar"
+)
+
+</script>
+
+{% endblock %}

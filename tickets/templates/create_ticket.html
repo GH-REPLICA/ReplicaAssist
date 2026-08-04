@@ -1,0 +1,205 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Nuevo ticket{% endblock %}
+{% block content %}
+
+<style>
+.ticket-create-title {
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+
+.ticket-create-subtitle {
+  margin-bottom: 16px;
+}
+
+.ticket-create-full {
+  grid-column: 1 / -1;
+}
+
+.ticket-create-errors {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.ticket-create-field-error {
+  color: #b91c1c;
+}
+
+.ticket-create-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.ticket-create-actions .btn {
+  min-width: 150px;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .ticket-create-title {
+    font-size: 22px;
+  }
+
+  .ticket-create-actions {
+    flex-direction: column-reverse;
+  }
+
+  .ticket-create-actions .btn {
+    width: 100%;
+    min-width: 0;
+  }
+}
+</style>
+
+<div class="card card-pad">
+  <div class="ticket-create-title">Crear Ticket</div>
+  <div class="small ticket-create-subtitle">Describe tu solicitud. Se asignará soporte automáticamente si existe un agente.</div>
+
+  <form method="POST" enctype="multipart/form-data" class="grid grid-2">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="ticket-create-full ticket-create-errors">
+      {% for err in form.non_field_errors %}
+      <div>{{ err }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="ticket-create-full">
+      <label class="small">Título *</label>
+      {{ form.title }}
+      {% if form.title.errors %}
+      <div class="small ticket-create-field-error">{{ form.title.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div class="ticket-create-full">
+      <label class="small">Descripción *</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+      <div class="small ticket-create-field-error">{{ form.description.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div class="ticket-create-full">
+      <label class="small">Adjuntar evidencia *</label>
+
+      
+      <input
+        type="file"
+        name="file"
+        class="input"
+        required
+      >
+
+      
+      <div class="small">
+        Adjunta evidencia del problema.
+        Tamaño máximo permitido: 10 MB.
+      </div>
+    </div>
+
+    <div>
+      <label class="small">Categoría *</label>
+      {{ form.category }}
+      {% if form.category.errors %}
+      <div class="small ticket-create-field-error">{{ form.category.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div>
+      <label class="small">Subcategoría *</label>
+      {{ form.subcategory }}
+      {% if form.subcategory.errors %}
+      <div class="small ticket-create-field-error">{{ form.subcategory.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    {% if role != "CLIENTE" %}
+    <div>
+      <label class="small">Prioridad *</label>
+      {{ form.priority }}
+      {% if form.priority.errors %}
+      <div class="small ticket-create-field-error">{{ form.priority.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+
+    <div>
+      <label class="small">Criticidad (Severidad) *</label>
+      {{ form.severity }}
+      {% if form.severity.errors %}
+      <div class="small ticket-create-field-error">{{ form.severity.errors|join:", " }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="ticket-create-actions">
+      <a class="btn light" href="{% url 'dashboard' %}">Cancelar</a>
+      <button class="btn" type="submit">Crear ticket</button>
+    </div>
+  </form>
+
+  <script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const categorySelect =
+        document.getElementById("id_category");
+
+    const subSelect =
+        document.getElementById("id_subcategory");
+
+    if (!categorySelect || !subSelect) return;
+
+    categorySelect.addEventListener("change", function () {
+
+        const categoryId = this.value;
+
+        subSelect.innerHTML =
+            '<option value="">Seleccione subcategoría</option>';
+
+        if (!categoryId) return;
+
+        fetch(`/get-subcategories/${categoryId}/`)
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                data.forEach(sub => {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = sub.id;
+                    option.textContent = sub.name;
+
+                    subSelect.appendChild(option);
+
+                });
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Error cargando subcategorías:",
+                    error
+                );
+
+            });
+
+    });
+
+});
+</script>
+</div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base_admin.html" %}
+{% block top_title %}Gestión de tickets{% endblock %}
+{% block content %}
+
+<div class="card card-pad" style="margin-bottom:16px;">
+  <div style="font-weight:900;margin-bottom:10px;">Filtros</div>
+  <form method="GET" class="grid grid-3">
+    <div>
+      <label class="small">Estado</label>
+      <select name="status" class="input">
+
+        <option value="">Todos</option>
+
+        {% for value,label in status_choices %}
+        <option value="{{ value }}"
+        {% if request.GET.status == value %}selected{% endif %}>
+        {{ label }}
+        </option>
+
+        {% endfor %}
+
+        </select>
+    </div>
+    <div>
+      <label class="small">Prioridad</label>
+      <select class="input" name="priority">
+        <option value="">Todas</option>
+        <option value="LOW" {% if request.GET.priority == "LOW" %}selected{% endif %}>LOW</option>
+        <option value="MEDIUM" {% if request.GET.priority == "MEDIUM" %}selected{% endif %}>MEDIUM</option>
+        <option value="HIGH" {% if request.GET.priority == "HIGH" %}selected{% endif %}>HIGH</option>
+        <option value="CRITICAL" {% if request.GET.priority == "CRITICAL" %}selected{% endif %}>CRITICAL</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:flex-end;justify-content:flex-end;">
+      <button class="btn" type="submit">Aplicar</button>
+    </div>
+  </form>
+</div>
+
+<div class="card card-pad">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Código</th><th>Título</th><th>Estado</th><th>Prioridad</th><th>Severidad</th><th>Asignado</th><th>SLA</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in tickets %}
+        <tr>
+          <td><b>{{ t.code }}</b></td>
+          <td>{{ t.title }}</td>
+          <td><span class="pill">{{ t.status }}</span></td>
+          <td>{{ t.priority }}</td>
+          <td>{{ t.severity }}</td>
+          <td>{% if t.assigned_to %}{{ t.assigned_to.username }}{% else %}-{% endif %}</td>
+          <td>
+            {% if t.is_sla_breached %}<span class="pill red">Vencido</span>
+            {% else %}<span class="pill green">OK</span>
+            {% endif %}
+          </td>
+          <td><a class="btn light" href="{% url 'ticket_detail' t.id %}">Ver</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8">No hay tickets</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
