@@ -304,11 +304,21 @@ button:hover{
 
 .video-close{
     position:absolute;
-    top:-30px;
-    right:0;
+    top:-16px;
+    right:-12px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:999px;
+    background:rgba(15,23,42,0.88);
     color:white;
-    font-size:30px;
+    font-size:22px;
+    line-height:1;
     cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
 }
 
 .video-opt{
@@ -507,9 +517,9 @@ button:hover{
                     <div class="video-modal-body">
 
                         <!-- BOTÓN CERRAR -->
-                        <span onclick="closeVideo()" class="video-close">
-                        ✖
-                        </span>
+                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="closeVideo()">
+                            ✕
+                        </button>
 
                         <!-- VIDEO -->
                         <video id="introVideo" width="100%" autoplay muted playsinline style="border-radius:12px;">
@@ -628,13 +638,35 @@ window.onload = function() {
 };
 
 function closeVideo() {
+    const videoEl = document.getElementById("introVideo");
     const checkbox = document.getElementById("dontShow");
 
     if (checkbox.checked) {
         localStorage.setItem("hide_video", "true");
     }
 
+    if (videoEl) {
+        videoEl.pause();
+    }
+
     document.getElementById("videoModal").style.display = "none";
+}
+
+window.closeVideo = closeVideo;
+
+const videoModal = document.getElementById("videoModal");
+const videoCloseBtn = document.getElementById("videoCloseBtn");
+
+if (videoCloseBtn) {
+    videoCloseBtn.addEventListener("click", closeVideo);
+}
+
+if (videoModal) {
+    videoModal.addEventListener("click", (event) => {
+        if (event.target === videoModal) {
+            closeVideo();
+        }
+    });
 }
 
 const captchaInput = document.getElementById("id_captcha");
@@ -794,6 +826,11 @@ if (forgotModal) {
 }
 
 document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && videoModal && videoModal.style.display !== "none") {
+        closeVideo();
+        return;
+    }
+
     if (event.key === "Escape" && forgotModal && forgotModal.classList.contains("open")) {
         closeForgotPasswordModal();
     }
