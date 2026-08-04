@@ -304,8 +304,8 @@ button:hover{
 
 .video-close{
     position:absolute;
-    top:-16px;
-    right:-12px;
+    top:10px;
+    right:10px;
     width:38px;
     height:38px;
     border:none;
@@ -512,12 +512,12 @@ button:hover{
 
             <br>
 
-            <div id="videoModal" class="video-modal">
+            <div id="videoModal" class="video-modal" onclick="if(event.target===this){closeVideoDirect();}">
 
                     <div class="video-modal-body">
 
                         <!-- BOTÓN CERRAR -->
-                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="closeVideo()">
+                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="closeVideoDirect()">
                             ✕
                         </button>
 
@@ -573,6 +573,7 @@ button:hover{
                                     data-value="{{ option.key }}"
                                     aria-label="{{ option.label }}"
                                     title="{{ option.label }}"
+                                    onclick="var input=document.getElementById('id_captcha');if(input){input.value='{{ option.key }}';}document.querySelectorAll('.captcha-option').forEach(function(el){el.classList.remove('active');});this.classList.add('active');var note=document.getElementById('captcha-selected-note');if(note){note.textContent='Icono seleccionado correctamente.';}var rnote=document.getElementById('captcha-refresh-note');if(rnote){rnote.textContent='';}"
                                 >
                                     {{ option.emoji }}
                                 </button>
@@ -631,16 +632,10 @@ button:hover{
 </div>
 
 <script>
-window.onload = function() {
-    if (localStorage.getItem("hide_video") === "true") {
-        document.getElementById("videoModal").style.display = "none";
-    }
-};
-
-function closeVideo() {
-    const videoEl = document.getElementById("introVideo");
-    const checkbox = document.getElementById("dontShow");
-    const videoModalEl = document.getElementById("videoModal");
+function closeVideoDirect() {
+    var videoEl = document.getElementById("introVideo");
+    var checkbox = document.getElementById("dontShow");
+    var modal = document.getElementById("videoModal");
 
     if (checkbox && checkbox.checked) {
         localStorage.setItem("hide_video", "true");
@@ -650,9 +645,23 @@ function closeVideo() {
         videoEl.pause();
     }
 
-    if (videoModalEl) {
-        videoModalEl.style.display = "none";
+    if (modal) {
+        modal.style.display = "none";
     }
+}
+
+window.closeVideoDirect = closeVideoDirect;
+</script>
+
+<script>
+window.onload = function() {
+    if (localStorage.getItem("hide_video") === "true") {
+        document.getElementById("videoModal").style.display = "none";
+    }
+};
+
+function closeVideo() {
+    closeVideoDirect();
 }
 
 window.closeVideo = closeVideo;
