@@ -512,12 +512,12 @@ button:hover{
 
             <br>
 
-            <div id="videoModal" class="video-modal">
+            <div id="videoModal" class="video-modal" onclick="if(event.target===this){var v=document.getElementById('introVideo');if(v){v.pause();}var c=document.getElementById('dontShow');if(c&&c.checked){localStorage.setItem('hide_video','true');}this.style.display='none';}">
 
                     <div class="video-modal-body">
 
                         <!-- BOTÓN CERRAR -->
-                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="closeVideo()">
+                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="var m=document.getElementById('videoModal');var v=document.getElementById('introVideo');if(v){v.pause();}var c=document.getElementById('dontShow');if(c&&c.checked){localStorage.setItem('hide_video','true');}if(m){m.style.display='none';}">
                             ✕
                         </button>
 
@@ -640,8 +640,9 @@ window.onload = function() {
 function closeVideo() {
     const videoEl = document.getElementById("introVideo");
     const checkbox = document.getElementById("dontShow");
+    const videoModalEl = document.getElementById("videoModal");
 
-    if (checkbox.checked) {
+    if (checkbox && checkbox.checked) {
         localStorage.setItem("hide_video", "true");
     }
 
@@ -649,7 +650,9 @@ function closeVideo() {
         videoEl.pause();
     }
 
-    document.getElementById("videoModal").style.display = "none";
+    if (videoModalEl) {
+        videoModalEl.style.display = "none";
+    }
 }
 
 window.closeVideo = closeVideo;
