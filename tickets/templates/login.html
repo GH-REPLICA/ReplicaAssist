@@ -512,12 +512,12 @@ button:hover{
 
             <br>
 
-            <div id="videoModal" class="video-modal" onclick="if(event.target===this){var v=document.getElementById('introVideo');if(v){v.pause();}var c=document.getElementById('dontShow');if(c&&c.checked){localStorage.setItem('hide_video','true');}this.style.display='none';}">
+            <div id="videoModal" class="video-modal">
 
                     <div class="video-modal-body">
 
                         <!-- BOTÓN CERRAR -->
-                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="var m=document.getElementById('videoModal');var v=document.getElementById('introVideo');if(v){v.pause();}var c=document.getElementById('dontShow');if(c&&c.checked){localStorage.setItem('hide_video','true');}if(m){m.style.display='none';}">
+                        <button type="button" id="videoCloseBtn" class="video-close" aria-label="Cerrar video" onclick="closeVideo()">
                             ✕
                         </button>
 
@@ -678,7 +678,6 @@ const captchaGrid = document.getElementById("captcha-grid");
 const captchaSelectedNote = document.getElementById("captcha-selected-note");
 const captchaRefreshNote = document.getElementById("captcha-refresh-note");
 const refreshCaptchaBtn = document.getElementById("refresh-captcha-btn");
-const loginForm = document.querySelector("form[method='post']");
 const captchaRefreshUrl = "{% url 'refresh_login_captcha' %}";
 
 function bindCaptchaOptionButtons() {
