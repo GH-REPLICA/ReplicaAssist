@@ -813,6 +813,10 @@ def login_view(request):
 
     now_ts = timezone.now().timestamp()
     blocked_until = request.session.get("login_blocked_until")
+    force_refresh_captcha = (
+        request.method == "GET"
+        and request.GET.get("refresh_captcha") == "1"
+    )
     captcha_rotated = bool(request.session.pop("captcha_rotated_notice", False))
 
     # Ensure captcha exists; refresh stale captcha proactively only on non-POST requests.
@@ -820,7 +824,10 @@ def login_view(request):
     has_valid_visual_options = isinstance(captcha_options, list) and len(captcha_options) >= 3
     has_captcha = bool(request.session.get("login_captcha_answer")) and has_valid_visual_options
 
-    if not has_captcha:
+    if force_refresh_captcha:
+        _set_login_captcha(request)
+        captcha_rotated = True
+    elif not has_captcha:
         _set_login_captcha(request)
     elif request.method != "POST" and _is_captcha_expired(request):
         _set_login_captcha(request)

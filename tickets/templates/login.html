@@ -720,12 +720,12 @@ async function refreshCaptchaInPlace(isAutoRefresh) {
         });
 
         if (!response.ok) {
-            return;
+            throw new Error("captcha_refresh_failed");
         }
 
         const data = await response.json();
         if (!data.ok) {
-            return;
+            throw new Error("captcha_refresh_invalid_payload");
         }
 
         if (captchaQuestionLabel) {
@@ -756,6 +756,12 @@ async function refreshCaptchaInPlace(isAutoRefresh) {
         if (captchaRefreshNote) {
             captchaRefreshNote.textContent = "No se pudo actualizar el captcha. Intenta de nuevo.";
         }
+
+        if (!isAutoRefresh) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("refresh_captcha", "1");
+            window.location.href = url.toString();
+        }
     }
 }
 
@@ -767,7 +773,15 @@ bindCaptchaOptionButtons();
 
 if (refreshCaptchaBtn) {
     refreshCaptchaBtn.addEventListener("click", async () => {
-        await refreshCaptchaInPlace(false);
+        refreshCaptchaBtn.disabled = true;
+        refreshCaptchaBtn.textContent = "Actualizando...";
+
+        try {
+            await refreshCaptchaInPlace(false);
+        } finally {
+            refreshCaptchaBtn.disabled = false;
+            refreshCaptchaBtn.textContent = "Cambiar captcha";
+        }
     });
 }
 
